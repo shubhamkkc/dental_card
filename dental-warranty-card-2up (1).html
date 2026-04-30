@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> – 2-Up PVC Card Printer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --panel: #161b22; --border: #30363d;
+  --accent: #1e90d4; --green: #0fa37f; --orange: #e07b1e;
+  --text: #e6edf3; --muted: #7d8590; --inp: #0d1117;
+}
+body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+header { padding: 14px 26px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 11px; background: var(--panel); }
+.dot  { width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent); }
+.dot2 { width:9px;height:9px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange); }
+header h1 { font-family:'DM Serif Display',serif;font-size:1.05rem; }
+header .tag { margin-left:auto;font-size:0.7rem;color:var(--muted);background:#21262d;padding:3px 10px;border-radius:20px;border:1px solid var(--border); }
+
+.app { display:grid;grid-template-columns:400px 1fr;flex:1;overflow:hidden; }
+
+.form-panel { background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto; }
+
+.sec-hdr { font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:13px 22px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px; }
+.badge { font-size:0.55rem;padding:2px 9px;border-radius:20px;font-weight:800;letter-spacing:0.08em; }
+.badge-1 { background:rgba(30,144,212,0.18);color:var(--accent);border:1px solid rgba(30,144,212,0.3); }
+.badge-2 { background:rgba(224,123,30,0.18);color:var(--orange);border:1px solid rgba(224,123,30,0.3); }
+
+.fields { padding:13px 22px;display:flex;flex-direction:column;gap:10px; }
+.field label { display:block;font-size:0.64rem;font-weight:700;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px; }
+.field input[type=text],
+.field input[type=date],
+.field input[type=number]:not(.teeth-inp) {
+  width:100%;background:var(--inp);border:1px solid var(--border);border-radius:6px;
+  padding:7px 10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.86rem;outline:none;transition:border-color 0.18s;
+}
+.field input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,144,212,0.12); }
+.card2-sec .field input:focus { border-color:var(--orange);box-shadow:0 0 0 3px rgba(224,123,30,0.12); }
+.row2 { display:grid;grid-template-columns:1fr 1fr;gap:9px; }
+
+.teeth-grid { display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden; }
+.tq { display:flex;flex-direction:column;align-items:center;padding:7px 6px;background:var(--inp);border:1px solid var(--border); }
+.tq:nth-child(1){border-radius:7px 0 0 0;} .tq:nth-child(2){border-radius:0 7px 0 0;}
+.tq:nth-child(3){border-radius:0 0 0 7px;} .tq:nth-child(4){border-radius:0 0 7px 0;}
+.tq span { font-size:0.58rem;font-weight:800;letter-spacing:0.1em;color:var(--muted);margin-bottom:3px; }
+.teeth-inp { width:50px;background:transparent;border:none;border-bottom:2px solid var(--border);text-align:center;color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;font-weight:700;outline:none;padding:2px 0; }
+
+.divider { height:1px;background:var(--border); }
+
+.slider-grp { padding:10px 22px 4px; }
+.sl-lbl { display:flex;justify-content:space-between;font-size:0.64rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px; }
+.sl-lbl span { color:var(--accent);font-weight:800; }
+input[type=range] { width:100%;accent-color:var(--accent);cursor:pointer; }
+
+.note { margin:8px 22px 10px;background:rgba(30,144,212,0.07);border:1px solid rgba(30,144,212,0.2);border-radius:8px;padding:10px 13px;font-size:0.71rem;color:#7ec8f0;line-height:1.65; }
+.note strong { color:var(--accent);display:block;margin-bottom:3px;font-size:0.73rem; }
+
+.actions { padding:12px 22px 18px;display:flex;flex-direction:column;gap:8px;margin-top:auto;border-top:1px solid var(--border); }
+.btn { width:100%;padding:10px;border:none;border-radius:7px;font-family:'Barlow',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:7px; }
+.btn-p { background:var(--accent);color:#fff; }
+.btn-p:hover { background:#1878b8;transform:translateY(-1px); }
+.btn-s { background:transparent;border:1px solid var(--border);color:var(--muted); }
+.btn-s:hover { border-color:var(--accent);color:var(--accent); }
+
+/* PREVIEW */
+.preview-panel { display:flex;flex-direction:column;align-items:center;background:#080c10;padding:20px;overflow-y:auto; }
+.preview-lbl { font-size:0.6rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px; }
+
+/*
+  A4 page: 8.263" x 11.693" @ 300dpi = 2479 x 3508px
+  Guide (cm -> 300dpi: 1cm=118.11px):
+    Rows: 1, 6.2, 7.1, 12.4 cm  |  Cols: 3.05, 11.4 cm
+  Card: w=8.35cm=986px, h=5.2cm=614px
+
+  Preview scale = 496/2479 = 0.2001
+  Card preview: left=72px, w=197px, h=123px
+  Card1 top = 1cm * 118.11 * 0.2001 = 23.6px ≈ 24px
+  Card2 top = 7.1cm * 118.11 * 0.2001 = 167.6px ≈ 168px
+*/
+.a4-wrap { position:relative;background:white;width:496px;height:702px;box-shadow:0 20px 60px rgba(0,0,0,0.7);flex-shrink:0; }
+.guide-h { position:absolute;left:0;right:0;height:1px;background:rgba(30,144,212,0.3);pointer-events:none; }
+.guide-v { position:absolute;top:0;bottom:0;width:1px;background:rgba(30,144,212,0.2);pointer-events:none; }
+
+.cprev { position:absolute;left:72px;width:197px;height:123px;border-radius:4px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.3); }
+#cp1 { top:24px;  background:linear-gradient(140deg,#c5eaf7 0%,#43b4e0 40%,#1270a8 100%); }
+#cp2 { top:168px; background:linear-gradient(140deg,#d4f7e0 0%,#43c8a0 40%,#0a7060 100%); }
+
+/* card preview internals */
+.cb1 { position:absolute;top:-28px;right:-22px;width:113px;height:88px;background:rgba(255,255,255,0.18);border-radius:50%; }
+.cb2 { position:absolute;top:0;right:0;width:88px;height:66px;background:rgba(255,255,255,0.22);border-radius:0 0 0 80%; }
+.chdr { position:absolute;top:0;right:0;width:91px;height:30px;border-radius:0 0 0 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 6px 0 10px; }
+.chdr1 { background:linear-gradient(135deg,#1a5fa0,#0d3580); }
+.chdr2 { background:linear-gradient(135deg,#0a6050,#063a2e); }
+.chdr-n { font-family:'DM Serif Display',serif;font-style:italic;font-size:0.34rem;color:#fff;text-align:center; }
+.chdr-s { font-size:0.19rem;color:#fb923c;font-weight:700;text-align:center;line-height:1.2;margin-top:1px; }
+.cbody { position:absolute;top:35px;left:9px;right:46px; }
+.crow { display:flex;align-items:baseline;margin-bottom:3px; }
+.clbl { font-size:0.22rem;font-weight:700;color:#082030;min-width:34px;flex-shrink:0; }
+.ccol { font-size:0.22rem;font-weight:700;color:#082030;margin-right:2px; }
+.cval { font-size:0.22rem;font-weight:700;color:#082030;overflow:hidden;white-space:nowrap;max-width:80px; }
+.cbadge { position:absolute;top:26px;right:6px;width:27px;height:27px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+.cbadge1 { background:conic-gradient(from 180deg,#1a5fa0,#0d3580,#1976d2,#1a5fa0);box-shadow:0 2px 6px rgba(0,0,0,0.4),0 0 0 2px #fff,0 0 0 3px #1a5fa0; }
+.cbadge2 { background:conic-gradient(from 180deg,#0a6050,#063a2e,#0d8060,#0a6050);box-shadow:0 2px 6px rgba(0,0,0,0.4),0 0 0 2px #fff,0 0 0 3px #0a6050; }
+.cbyr { font-family:'DM Serif Display',serif;font-size:0.58rem;color:#fff;line-height:1; }
+.cbyl { font-size:0.14rem;font-weight:700;color:#90caf9;letter-spacing:0.06em;text-transform:uppercase; }
+.cbwl { font-size:0.12rem;font-weight:700;color:#fb923c;text-transform:uppercase; }
+.cteeth { position:absolute;bottom:7px;left:9px;right:9px;display:flex;flex-direction:column;gap:2px; }
+.ctr { display:flex;gap:2px; }
+.ctb { flex:1;border:0.6px solid rgba(8,32,48,0.3);border-radius:2px;padding:1.5px 2px;display:flex;flex-direction:column;align-items:center; }
+.ctbl { font-size:0.15rem;font-weight:800;color:rgba(8,32,48,0.5); }
+.ctbv { font-size:0.28rem;font-weight:800;color:#082030; }
+
+.a4-info { margin-top:12px;font-size:0.68rem;color:var(--muted);text-align:center;line-height:1.7; }
+.a4-info strong { color:var(--green); }
+
+/* EXPORT */
+/*
+  Export A4: 2479 x 3508px
+  Card1: top=118px(1cm), left=360px(3.05cm), w=986px, h=614px
+  Card2: top=839px(7.1cm), same w/h
+*/
+#export-a4 {
+  position:fixed;top:-9999px;left:-9999px;
+  width:2479px;height:3508px;background:white;font-family:'Barlow',sans-serif;overflow:hidden;
+}
+.excard {
+  position:absolute;left:360px;width:986px;height:614px;overflow:hidden;
+}
+#exc1 { top:118px; background:linear-gradient(140deg,#c5eaf7 0%,#43b4e0 40%,#1270a8 100%); }
+#exc2 { top:839px; background:linear-gradient(140deg,#d4f7e0 0%,#43c8a0 40%,#0a7060 100%); }
+
+.xb1 { position:absolute;top:-140px;right:-110px;width:560px;height:440px;background:rgba(255,255,255,0.18);border-radius:50%; }
+.xb2 { position:absolute;top:0;right:0;width:436px;height:330px;background:rgba(255,255,255,0.22);border-radius:0 0 0 80%; }
+.xhdr { position:absolute;top:0;right:0;width:452px;height:120px;border-radius:0 0 0 82px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 26px 0 50px; }
+.xhdr1 { background:linear-gradient(135deg,#1a5fa0,#0d3580); }
+.xhdr2 { background:linear-gradient(135deg,#0a6050,#063a2e); }
+.xhdr-n { font-family:'DM Serif Display',serif;font-style:italic;font-size:1.72rem;color:#fff;font-weight:400;text-align:center; }
+.xhdr-s { font-size:0.78rem;color:#fb923c;font-weight:700;text-align:center;letter-spacing:0.04em;line-height:1.35;margin-top:3px; }
+.xbody { position:absolute;top:140px;left:44px;right:220px; }
+.xrow { display:flex;align-items:baseline;margin-bottom:18px; }
+.xlbl { font-size:1.12rem;font-weight:700;color:#082030;min-width:176px;flex-shrink:0; }
+.xcol { font-size:1.12rem;font-weight:700;color:#082030;margin-right:10px; }
+.xval { font-size:1.12rem;font-weight:700;color:#082030; }
+.xbadge { position:absolute;top:126px;right:36px;width:138px;height:138px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+.xbadge1 { background:conic-gradient(from 180deg,#1a5fa0,#0d3580,#1976d2,#1a5fa0);box-shadow:0 6px 24px rgba(0,0,0,0.42),0 0 0 6px #fff,0 0 0 11px #1a5fa0; }
+.xbadge2 { background:conic-gradient(from 180deg,#0a6050,#063a2e,#0d8060,#0a6050);box-shadow:0 6px 24px rgba(0,0,0,0.42),0 0 0 6px #fff,0 0 0 11px #0a6050; }
+.xbyr { font-family:'DM Serif Display',serif;font-size:3.1rem;color:#fff;line-height:1;font-weight:400; }
+.xbyl { font-size:0.78rem;font-weight:700;color:#90caf9;letter-spacing:0.12em;text-transform:uppercase; }
+.xbwl { font-size:0.62rem;font-weight:700;color:#fb923c;letter-spacing:0.1em;text-transform:uppercase;margin-top:3px; }
+.xteeth { position:absolute;bottom:36px;left:44px;right:220px; }
+.xtg { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+.xtb { border:1.5px solid rgba(8,32,48,0.25);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.15); }
+.xtbl { font-size:0.65rem;font-weight:800;color:rgba(8,32,48,0.5);letter-spacing:0.1em;text-transform:uppercase; }
+.xtbv { font-size:1.4rem;font-weight:800;color:#082030;line-height:1.2; }
+
+.toast { position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;padding:11px 18px;border-radius:8px;font-weight:700;font-size:0.86rem;transform:translateY(70px);opacity:0;transition:all 0.28s;z-index:999; }
+.toast.show { transform:translateY(0);opacity:1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="dot"></div><div class="dot2"></div>
+  <h1> — 2-Up PVC Card Printer</h1>
+  <span class="tag">8.263″ × 11.693″ · 300 dpi · 2 Customers per Page</span>
+</header>
+
+<div class="app">
+
+<!-- ═══ FORM ═══ -->
+<div class="form-panel">
+
+  <div class="sec-hdr"><span class="badge badge-1">CARD 1</span> Customer Details</div>
+  <div class="fields">
+    <div class="field"><label>Dentist Name</label><input type="text" id="d1" value="Dr Sourav Boss" oninput="upd()"></div>
+    <div class="field"><label>Patient Name</label><input type="text" id="p1" value="Jay Prakash Narayan Jha" oninput="upd()"></div>
+    <div class="field"><label>Job No.</label><input type="text" id="j1" value="2504932" oninput="upd()"></div>
+    <div class="field"><label>Types of Work</label><input type="text" id="w1" value="Zirconia Classic" oninput="upd()"></div>
+    <div class="row2">
+      <div class="field"><label>Date</label><input type="date" id="dt1" oninput="upd()"></div>
+      <div class="field"><label>Warranty (Yrs)</label><input type="number" id="yr1" value="10" min="1" max="25" oninput="upd()"></div>
+    </div>
+    <div class="field">
+      <label>Teeth — 4 Sections</label>
+      <div class="teeth-grid">
+        <div class="tq"><span>LT Left Top</span><input class="teeth-inp" type="number" id="lt1" min="0" max="99" placeholder="0" oninput="upd()"></div>
+        <div class="tq"><span>RT Right Top</span><input class="teeth-inp" type="number" id="rt1" min="0" max="99" placeholder="0" oninput="upd()"></div>
+        <div class="tq"><span>LB Left Bot</span><input class="teeth-inp" type="number" id="lb1" min="0" max="99" placeholder="0" oninput="upd()"></div>
+        <div class="tq"><span>RB Right Bot</span><input class="teeth-inp" type="number" id="rb1" min="0" max="99" placeholder="0" oninput="upd()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="sec-hdr"><span class="badge badge-2">CARD 2</span> Customer Details</div>
+  <div class="fields card2-sec">
+    <div class="field"><label>Dentist Name</label><input type="text" id="d2" placeholder="Dr. Name" oninput="upd()"></div>
+    <div class="field"><label>Patient Name</label><input type="text" id="p2" placeholder="Patient Name" oninput="upd()"></div>
+    <div class="field"><label>Job No.</label><input type="text" id="j2" placeholder="Job Number" oninput="upd()"></div>
+    <div class="field"><label>Types of Work</label><input type="text" id="w2" placeholder="e.g. Zirconia Classic" oninput="upd()"></div>
+    <div class="row2">
+      <div class="field"><label>Date</label><input type="date" id="dt2" oninput="upd()"></div>
+      <div class="field"><label>Warranty (Yrs)</label><input type="number" id="yr2" value="10" min="1" max="25" oninput="upd()"></div>
+    </div>
+    <div class="field">
+      <label>Teeth — 4 Sections</label>
+      <div class="teeth-grid">
+        <div class="tq"><span>LT Left Top</span><input class="teeth-inp" type="number" id="lt2" min="0" max="99" placeholder="0" oninput="upd()"></div>
+        <div class="tq"><span>RT Right Top</span><input class="teeth-inp" type="number" id="rt2" min="0" max="99" placeholder="0" oninput="upd()"></div>
+        <div class="tq"><span>LB Left Bot</span><input class="teeth-inp" type="number" id="lb2" min="0" max="99" placeholder="0" oninput="upd()"></div>
+        <div class="tq"><span>RB Right Bot</span><input class="teeth-inp" type="number" id="rb2" min="0" max="99" placeholder="0" oninput="upd()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sec-hdr" style="border-top:none;">Fine-Tune Print Position</div>
+  <div class="slider-grp">
+    <div class="sl-lbl">Horizontal (X) <span id="xv">0 mm</span></div>
+    <input type="range" id="ox" min="-20" max="20" value="0" step="1" oninput="updOffset()">
+  </div>
+  <div class="slider-grp" style="padding-bottom:10px;">
+    <div class="sl-lbl">Vertical (Y) <span id="yv">0 mm</span></div>
+    <input type="range" id="oy" min="-20" max="20" value="0" step="1" oninput="updOffset()">
+  </div>
+
+  <div class="note">
+    <strong>🖨️ PVC Card Print — YouTube Format</strong>
+    Page: <b>8.263″ × 11.693″</b> · <b>300 dpi</b><br>
+    Rows: <b>1 · 6.2 · 7.1 · 12.4 cm</b> &nbsp;|&nbsp; Cols: <b>3.05 · 11.4 cm</b><br>
+    Print at <b>100% scale / No margins / Manual feed</b>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-p" onclick="exportJPG()">⬇ Save A4 JPG — Both Cards</button>
+    <button class="btn btn-s" onclick="resetAll()">↺ Reset All</button>
+  </div>
+</div>
+
+<!-- ═══ PREVIEW ═══ -->
+<div class="preview-panel">
+  <div class="preview-lbl">A4 Live Preview · Card 1 (Blue) + Card 2 (Green)</div>
+
+  <div class="a4-wrap">
+    <div class="guide-h" style="top:24px;"></div>
+    <div class="guide-h" style="top:147px;"></div>
+    <div class="guide-h" style="top:168px;"></div>
+    <div class="guide-h" style="top:292px;"></div>
+    <div class="guide-v" style="left:72px;"></div>
+    <div class="guide-v" style="left:269px;"></div>
+
+    <!-- Card 1 -->
+    <div class="cprev" id="cp1">
+      <div class="cb1"></div><div class="cb2"></div>
+      <div class="chdr chdr1">
+        <div class="chdr-n"></div>
+        <div class="chdr-s">Certified Warranty for<br>work done in our Lab</div>
+      </div>
+      <div class="cbody">
+        <div class="crow"><span class="clbl">Dentist</span><span class="ccol">:</span><span class="cval" id="v-d1"></span></div>
+        <div class="crow"><span class="clbl">Patient</span><span class="ccol">:</span><span class="cval" id="v-p1"></span></div>
+        <div class="crow"><span class="clbl">Job No</span><span class="ccol">:</span><span class="cval" id="v-j1"></span></div>
+        <div class="crow"><span class="clbl">Work</span><span class="ccol">:</span><span class="cval" id="v-w1"></span></div>
+        <div class="crow"><span class="clbl">Date</span><span class="ccol">:</span><span class="cval" id="v-dt1"></span></div>
+      </div>
+      <div class="cbadge cbadge1">
+        <div class="cbyr" id="v-yr1">10</div>
+        <div class="cbyl">YR</div>
+        <div class="cbwl">WARR</div>
+      </div>
+      <div class="cteeth">
+        <div class="ctr">
+          <div class="ctb"><div class="ctbl">LT</div><div class="ctbv" id="v-lt1">—</div></div>
+          <div class="ctb"><div class="ctbl">RT</div><div class="ctbv" id="v-rt1">—</div></div>
+        </div>
+        <div class="ctr">
+          <div class="ctb"><div class="ctbl">LB</div><div class="ctbv" id="v-lb1">—</div></div>
+          <div class="ctb"><div class="ctbl">RB</div><div class="ctbv" id="v-rb1">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="cprev" id="cp2">
+      <div class="cb1"></div><div class="cb2"></div>
+      <div class="chdr chdr2">
+        <div class="chdr-n"></div>
+        <div class="chdr-s">Certified Warranty for<br>work done in our Lab</div>
+      </div>
+      <div class="cbody">
+        <div class="crow"><span class="clbl">Dentist</span><span class="ccol">:</span><span class="cval" id="v-d2"></span></div>
+        <div class="crow"><span class="clbl">Patient</span><span class="ccol">:</span><span class="cval" id="v-p2"></span></div>
+        <div class="crow"><span class="clbl">Job No</span><span class="ccol">:</span><span class="cval" id="v-j2"></span></div>
+        <div class="crow"><span class="clbl">Work</span><span class="ccol">:</span><span class="cval" id="v-w2"></span></div>
+        <div class="crow"><span class="clbl">Date</span><span class="ccol">:</span><span class="cval" id="v-dt2"></span></div>
+      </div>
+      <div class="cbadge cbadge2">
+        <div class="cbyr" id="v-yr2">10</div>
+        <div class="cbyl">YR</div>
+        <div class="cbwl">WARR</div>
+      </div>
+      <div class="cteeth">
+        <div class="ctr">
+          <div class="ctb"><div class="ctbl">LT</div><div class="ctbv" id="v-lt2">—</div></div>
+          <div class="ctb"><div class="ctbl">RT</div><div class="ctbv" id="v-rt2">—</div></div>
+        </div>
+        <div class="ctr">
+          <div class="ctb"><div class="ctbl">LB</div><div class="ctbv" id="v-lb2">—</div></div>
+          <div class="ctb"><div class="ctbl">RB</div><div class="ctbv" id="v-rb2">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="a4-info">
+    Page: <strong>2479 × 3508 px</strong> &nbsp;·&nbsp;
+    Each card: <strong>986 × 614 px</strong> &nbsp;·&nbsp;
+    Both cards update live as you type
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<!-- ═══ HIDDEN HIGH-RES EXPORT ═══ -->
+<div id="export-a4">
+
+  <div class="excard" id="exc1">
+    <div class="xb1"></div><div class="xb2"></div>
+    <div class="xhdr xhdr1">
+      <div class="xhdr-n"></div>
+      <div class="xhdr-s">Certified of limited Warranty Hereby Offer Warranty<br>for Following work done in our Lab</div>
+    </div>
+    <div class="xbody">
+      <div class="xrow"><span class="xlbl">Dentist Name</span><span class="xcol">:</span><span class="xval" id="x-d1"></span></div>
+      <div class="xrow"><span class="xlbl">Patient Name</span><span class="xcol">:</span><span class="xval" id="x-p1"></span></div>
+      <div class="xrow"><span class="xlbl">Job No.</span><span class="xcol">:</span><span class="xval" id="x-j1"></span></div>
+      <div class="xrow"><span class="xlbl">Types of Work</span><span class="xcol">:</span><span class="xval" id="x-w1"></span></div>
+      <div class="xrow" style="margin-bottom:0"><span class="xlbl">Date</span><span class="xcol">:</span><span class="xval" id="x-dt1"></span></div>
+    </div>
+    <div class="xbadge xbadge1">
+      <div class="xbyr" id="x-yr1">10</div>
+      <div class="xbyl">YEAR</div>
+      <div class="xbwl">WARRANTY</div>
+    </div>
+    <div class="xteeth">
+      <div class="xtg">
+        <div class="xtb"><div class="xtbl">LT — Left Top</div><div class="xtbv" id="x-lt1">—</div></div>
+        <div class="xtb"><div class="xtbl">RT — Right Top</div><div class="xtbv" id="x-rt1">—</div></div>
+        <div class="xtb"><div class="xtbl">LB — Left Bottom</div><div class="xtbv" id="x-lb1">—</div></div>
+        <div class="xtb"><div class="xtbl">RB — Right Bottom</div><div class="xtbv" id="x-rb1">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="excard" id="exc2">
+    <div class="xb1"></div><div class="xb2"></div>
+    <div class="xhdr xhdr2">
+      <div class="xhdr-n"></div>
+      <div class="xhdr-s">Certified of limited Warranty Hereby Offer Warranty<br>for Following work done in our Lab</div>
+    </div>
+    <div class="xbody">
+      <div class="xrow"><span class="xlbl">Dentist Name</span><span class="xcol">:</span><span class="xval" id="x-d2"></span></div>
+      <div class="xrow"><span class="xlbl">Patient Name</span><span class="xcol">:</span><span class="xval" id="x-p2"></span></div>
+      <div class="xrow"><span class="xlbl">Job No.</span><span class="xcol">:</span><span class="xval" id="x-j2"></span></div>
+      <div class="xrow"><span class="xlbl">Types of Work</span><span class="xcol">:</span><span class="xval" id="x-w2"></span></div>
+      <div class="xrow" style="margin-bottom:0"><span class="xlbl">Date</span><span class="xcol">:</span><span class="xval" id="x-dt2"></span></div>
+    </div>
+    <div class="xbadge xbadge2">
+      <div class="xbyr" id="x-yr2">10</div>
+      <div class="xbyl">YEAR</div>
+      <div class="xbwl">WARRANTY</div>
+    </div>
+    <div class="xteeth">
+      <div class="xtg">
+        <div class="xtb"><div class="xtbl">LT — Left Top</div><div class="xtbv" id="x-lt2">—</div></div>
+        <div class="xtb"><div class="xtbl">RT — Right Top</div><div class="xtbv" id="x-rt2">—</div></div>
+        <div class="xtb"><div class="xtbl">LB — Left Bottom</div><div class="xtbv" id="x-lb2">—</div></div>
+        <div class="xtb"><div class="xtbl">RB — Right Bottom</div><div class="xtbv" id="x-rb2">—</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">✅ A4 JPG saved — Both Cards!</div>
+
+<script>
+const today = new Date();
+document.getElementById('dt1').value = today.toISOString().split('T')[0];
+document.getElementById('dt2').value = today.toISOString().split('T')[0];
+upd();
+
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s + 'T00:00:00');
+  const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return d.getDate() + '-' + M[d.getMonth()] + '-' + d.getFullYear();
+}
+
+function upd() {
+  for (let n = 1; n <= 2; n++) {
+    const v = {
+      d:  document.getElementById('d'  + n).value,
+      p:  document.getElementById('p'  + n).value,
+      j:  document.getElementById('j'  + n).value,
+      w:  document.getElementById('w'  + n).value,
+      dt: fmtDate(document.getElementById('dt' + n).value),
+      yr: document.getElementById('yr' + n).value,
+      lt: document.getElementById('lt' + n).value || '—',
+      rt: document.getElementById('rt' + n).value || '—',
+      lb: document.getElementById('lb' + n).value || '—',
+      rb: document.getElementById('rb' + n).value || '—',
+    };
+    ['d','p','j','w','dt','yr','lt','rt','lb','rb'].forEach(k => {
+      const pv = document.getElementById('v-' + k + n);
+      const ex = document.getElementById('x-' + k + n);
+      if (pv) pv.textContent = v[k];
+      if (ex) ex.textContent = v[k];
+    });
+  }
+}
+
+// Preview: A4=210mm wide shown as 496px → px/mm = 2.3619
+const PRV = 496 / 210;
+// Export: 300dpi → 11.811 px/mm
+const EXP = 11.811;
+// Base positions (mm): card1 top=10, card2 top=71, left=30.5
+const B = { c1: 10, c2: 71, l: 30.5 };
+
+function updOffset() {
+  const x = parseInt(document.getElementById('ox').value);
+  const y = parseInt(document.getElementById('oy').value);
+  document.getElementById('xv').textContent = (x>=0?'+':'')+x+' mm';
+  document.getElementById('yv').textContent = (y>=0?'+':'')+y+' mm';
+  document.getElementById('cp1').style.left = ((B.l+x)*PRV)+'px';
+  document.getElementById('cp1').style.top  = ((B.c1+y)*PRV)+'px';
+  document.getElementById('cp2').style.left = ((B.l+x)*PRV)+'px';
+  document.getElementById('cp2').style.top  = ((B.c2+y)*PRV)+'px';
+  document.getElementById('exc1').style.left = ((B.l+x)*EXP)+'px';
+  document.getElementById('exc1').style.top  = ((B.c1+y)*EXP)+'px';
+  document.getElementById('exc2').style.left = ((B.l+x)*EXP)+'px';
+  document.getElementById('exc2').style.top  = ((B.c2+y)*EXP)+'px';
+}
+
+function exportJPG() {
+  const el = document.getElementById('export-a4');
+  el.style.cssText = 'position:fixed;top:0;left:0;z-index:-1;width:2479px;height:3508px;background:white;font-family:Barlow,sans-serif;overflow:hidden;';
+  html2canvas(el, { width:2479, height:3508, scale:1, useCORS:true, backgroundColor:'#ffffff', logging:false })
+    .then(canvas => {
+      el.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:2479px;height:3508px;background:white;font-family:Barlow,sans-serif;overflow:hidden;';
+      const a = document.createElement('a');
+      const p1 = (document.getElementById('p1').value || 'patient1').replace(/\s+/g,'_');
+      const p2 = (document.getElementById('p2').value || 'patient2').replace(/\s+/g,'_');
+      const dt = today.toLocaleDateString('en-GB').replace(/\//g,'-');
+      a.download = `WarrantyCard_2UP_${p1}_${p2}_${dt}.jpg`;
+      a.href = canvas.toDataURL('image/jpeg', 0.98);
+      a.click();
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    });
+}
+
+function resetAll() {
+  ['d1','p1','j1','w1','lt1','rt1','lb1','rb1',
+   'd2','p2','j2','w2','lt2','rt2','lb2','rb2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('yr1').value = '10';
+  document.getElementById('yr2').value = '10';
+  document.getElementById('dt1').value = today.toISOString().split('T')[0];
+  document.getElementById('dt2').value = today.toISOString().split('T')[0];
+  document.getElementById('ox').value = 0;
+  document.getElementById('oy').value = 0;
+  document.getElementById('xv').textContent = '0 mm';
+  document.getElementById('yv').textContent = '0 mm';
+  ['cp1','cp2','exc1','exc2'].forEach(id => document.getElementById(id).style.cssText = '');
+  upd();
+}
+</script>
+</body>
+</html>

@@ -1,65 +1,94 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import Header from '@/components/Header';
+import CardForm from '@/components/CardForm';
+import PrintOffsetSliders from '@/components/PrintOffsetSliders';
+import A4Preview from '@/components/A4Preview';
+import ExportPanel from '@/components/ExportPanel';
+import { CardData } from '@/types/card';
+
+const initialCard1: CardData = {
+  labName: '',
+  dentist: '',
+  patient: '',
+  jobNo: '',
+  workType: 'Zirconia Classic',
+  date: new Date().toISOString().split('T')[0],
+  warrantyYears: 10,
+  teeth: { lt: '', rt: '', lb: '', rb: '' }
+};
+
+const initialCard2: CardData = {
+  labName: '',
+  dentist: '',
+  patient: '',
+  jobNo: '',
+  workType: 'Zirconia Classic',
+  date: new Date().toISOString().split('T')[0],
+  warrantyYears: 10,
+  teeth: { lt: '', rt: '', lb: '', rb: '' }
+};
 
 export default function Home() {
+  const [card1, setCard1] = useState<CardData>(initialCard1);
+  const [card2, setCard2] = useState<CardData>(initialCard2);
+  const [enableCard2, setEnableCard2] = useState<boolean>(true);
+  const [offsetX, setOffsetX] = useState<number>(0);
+  const [offsetY, setOffsetY] = useState<number>(0);
+
+  const handleReset = () => {
+    setCard1(initialCard1);
+    setCard2(initialCard2);
+    setEnableCard2(true);
+    setOffsetX(0);
+    setOffsetY(0);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <>
+      <Header />
+      <div className="app">
+        <div className="form-panel">
+          <CardForm cardNumber={1} data={card1} onChange={setCard1} />
+          <div className="divider"></div>
+          <CardForm 
+            cardNumber={2} 
+            data={card2} 
+            onChange={setCard2} 
+            isOptional={true} 
+            isEnabled={enableCard2} 
+            onToggle={setEnableCard2} 
+          />
+          <PrintOffsetSliders 
+            offsetX={offsetX} 
+            offsetY={offsetY} 
+            setOffsetX={setOffsetX} 
+            setOffsetY={setOffsetY} 
+          />
+          <div className="note">
+            <strong>🖨️ PVC Card Print — YouTube Format</strong>
+            Page: <b>8.263″ × 11.693″</b> · <b>300 dpi</b><br />
+            Rows: <b>1 · 6.2 · 7.1 · 12.4 cm</b> &nbsp;|&nbsp; Cols: <b>3.05 · 11.4 cm</b><br />
+            Print at <b>100% scale / No margins / Manual feed</b>
+          </div>
+          <ExportPanel 
+            card1={card1} 
+            card2={card2} 
+            enableCard2={enableCard2}
+            offsetX={offsetX} 
+            offsetY={offsetY} 
+            onReset={handleReset} 
+          />
+        </div>
+        <A4Preview 
+          card1={card1} 
+          card2={card2} 
+          enableCard2={enableCard2}
+          offsetX={offsetX} 
+          offsetY={offsetY} 
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
