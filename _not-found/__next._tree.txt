@@ -1,2 +1,2 @@
-:HL["/dental_card/_next/static/chunks/156z_-8-33x66.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"N_uClVRR2tWfT_l3IhagV"}
+:HL["/dental_card/_next/static/chunks/0e_x105fpj6vv.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"jMxGpc9Y0G4CfnOH7x8Dk"}
